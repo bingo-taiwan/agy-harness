@@ -1,0 +1,19 @@
+# OS generated files
+.DS_Store
+Thumbs.db
+ehthumbs.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.venv/
+env/
+venv/
+
+# Antigravity CLI / Temp
+*.log
+temp/
+C:/temp/
+.gemini/antigravity-cli/brain/*/scratch/

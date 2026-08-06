@@ -1,0 +1,40 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  validate:
+    name: Validate Scripts & Harness Rules
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Run Python Generator & Verify UTF-8 BOM
+        run: |
+          python build_installer.py
+
+      - name: Test PowerShell Setup Installer
+        shell: powershell
+        run: |
+          .\setup-agy-harness.ps1
+
+      - name: Verify Rule Injections
+        shell: powershell
+        run: |
+          $userHome = $env:USERPROFILE
+          $agentsFile = Join-Path $userHome "AGENTS.md"
+          if (Test-Path $agentsFile) {
+              $content = Get-Content $agentsFile -Raw
+              if ($content -like "*OneDrive 與雲端隨選檔案*") {
+                  Write-Host "AGENTS.md validation passed!"
+              } else {
+                  Write-Error "AGENTS.md rule injection failed!"
+                  exit 1
+              }
+          }
