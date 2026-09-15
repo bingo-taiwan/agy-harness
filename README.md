@@ -83,6 +83,23 @@ C:\Users\user\.gemini\bin\agy-safe.ps1 -p "讀取 @'X:\專案\數據.xlsx' 與 O
 
 ---
 
+### 🤝 延伸：agy × Gemini Desktop 協作（2026-09-15 實測）
+
+`agy` 是 Antigravity CLI，Gemini Desktop 是消費者版 app，兩者官方**沒有**互通介面。實測結論：
+
+| 任務 | 用什麼 | 實測 |
+| :--- | :--- | :--- |
+| 查 Gmail / 日曆 / Drive 資料 | `gws` CLI | 3 秒回精確 JSON；Gemini `@Gmail` 要 24 秒且是摘要 |
+| 無頭產圖、在 pipeline 裡問模型 | `agy`（`generate_image`、`--model`） | 31 秒，1376×768 |
+| 原尺寸 Nano Banana 圖、Deep Research、Canvas、Gems | Gemini Desktop（Windows 版可用 CDP 遙控） | 產圖 2752×1536；Deep Research 約 9.5 分鐘 |
+| 操控滑鼠鍵盤、Obsidian / Git MCP、自訂 MCP | 只有 **macOS 版** Gemini Desktop 內建（原生 Swift，非 Electron；Windows 版沒有，也不能用 CDP 遙控 Mac 版） | 二進位檔逆向確認，帳號是否啟用待官方推送 |
+
+- Windows 版怎麼用 CDP 遙控、macOS 版逆向細節、三條路的速度與 token 對照：
+  [Gemini Desktop 實機拆解第三版](https://notes.mynet.com.tw/tech/gemini-desktop-vs-agy-cli)
+- 讓 agent 自動選對工具：把上面這張表放進你的 `AGENTS.md` / `GEMINI.md`，範本見 [agent-md-starter](https://github.com/bingo-taiwan/agent-md-starter)。
+
+---
+
 ## 🇺🇸 English Description
 
 `agy-harness` is an open-source, production-grade safety wrapper and system rule harness for **Antigravity CLI (`agy`)**.
@@ -92,6 +109,22 @@ C:\Users\user\.gemini\bin\agy-safe.ps1 -p "讀取 @'X:\專案\數據.xlsx' 與 O
 - **Binary View Protection**: Prevents `agy` from calling `view_file` on binary files (`.jpg`, `.png`, `.pdf`, `.docx`, `.xlsx`, `.pptx`, `.zip`), eliminating `media has no inline data` (HTTP 400) crashes.
 - **Trajectory Sanitization**: Protects conversation sessions from permanent history poisoning.
 - **Autonomous File Handling**: Pre-copies NAS (`X:\`) and paths containing spaces or non-ASCII characters without user intervention.
+
+---
+
+### 🤝 Beyond files: agy × Gemini Desktop (tested 2026-09-15)
+
+`agy` (Antigravity CLI) and the consumer Gemini Desktop app have **no official bridge**. What actually works:
+
+| Task | Use | Measured |
+| :--- | :--- | :--- |
+| Query Gmail / Calendar / Drive data | `gws` CLI | 3 s, exact JSON; Gemini `@Gmail` takes 24 s and returns a summary |
+| Headless image generation, model calls inside a pipeline | `agy` (`generate_image`, `--model`) | 31 s, 1376×768 |
+| Full-size Nano Banana images, Deep Research, Canvas, Gems | Gemini Desktop (Windows build can be driven over CDP) | 2752×1536 images; Deep Research ≈ 9.5 min |
+| Mouse/keyboard control, Obsidian / Git MCP, custom MCP | **macOS build only** (native Swift, not Electron; absent on Windows, and CDP does not apply to the Mac build) | Confirmed by binary strings; per-account rollout still pending |
+
+Full write-up (CDP remote control on Windows, macOS reverse-engineering, speed/token comparison):
+[Gemini Desktop teardown, 3rd edition](https://notes.mynet.com.tw/tech/gemini-desktop-vs-agy-cli) (zh-TW).
 
 ---
 
