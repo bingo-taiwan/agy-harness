@@ -68,7 +68,7 @@ bash agy-harness/gemini-desktop/install.sh
 
 - 純寫程式、改 repo、跑測試，不碰 Google 服務也不產圖。
 - 需要無頭、可版控、批次幾百次的呼叫。Gemini Desktop 一次只能一個對話、慢、且批次有違反使用條款的風險。
-- 對方沒有 Pro / Ultra 訂閱。免費帳號的 Desktop 額度很低、產圖也不保證。
+- 對方沒有 Pro / Ultra 訂閱。本模組的數字都是訂閱帳號實測，免費帳號沒驗證過，別拿這裡的數字去承諾。
 
 ### 什麼時候值得多裝這一包
 
