@@ -92,7 +92,8 @@ C:\Users\user\.gemini\bin\agy-safe.ps1 -p "讀取 @'X:\專案\數據.xlsx' 與 O
 | 查 Gmail / 日曆 / Drive 資料 | `gws` CLI | 3 秒回精確 JSON；Gemini `@Gmail` 要 24 秒且是摘要 |
 | 無頭產圖、在 pipeline 裡問模型 | `agy`（`generate_image`、`--model`） | 31 秒，1376×768 |
 | 原尺寸 Nano Banana 圖、Deep Research、Canvas、Gems | Gemini Desktop（Windows 版可用 CDP 遙控） | 產圖 2752×1536；Deep Research 約 9.5 分鐘 |
-| 操控滑鼠鍵盤、Obsidian / Git MCP、自訂 MCP | 只有 **macOS 版** Gemini Desktop 內建（原生 Swift，非 Electron；Windows 版沒有，也不能用 CDP 遙控 Mac 版） | 二進位檔逆向確認，帳號是否啟用待官方推送 |
+| Obsidian / Git MCP、自訂 MCP、排程、Skills、本機資料夾 | 只有 **macOS 版** Gemini Desktop 的 Spark 模式（原生 Swift，非 Electron；Windows 版沒有，也不能用 CDP 遙控 Mac 版） | 2026-09-16 台灣 Ultra 帳號實測已開；Workspace 帳號沒有 Spark |
+| 操控滑鼠鍵盤（Computer Use） | 目前沒有任何一條路 | macOS 版二進位檔有完整模組，但設定頁尚未對帳號開放 |
 
 - Windows 版怎麼用 CDP 遙控、macOS 版逆向細節、三條路的速度與 token 對照：
   [Gemini Desktop 實機拆解第三版](https://notes.mynet.com.tw/tech/gemini-desktop-vs-agy-cli)
@@ -121,7 +122,8 @@ C:\Users\user\.gemini\bin\agy-safe.ps1 -p "讀取 @'X:\專案\數據.xlsx' 與 O
 | Query Gmail / Calendar / Drive data | `gws` CLI | 3 s, exact JSON; Gemini `@Gmail` takes 24 s and returns a summary |
 | Headless image generation, model calls inside a pipeline | `agy` (`generate_image`, `--model`) | 31 s, 1376×768 |
 | Full-size Nano Banana images, Deep Research, Canvas, Gems | Gemini Desktop (Windows build can be driven over CDP) | 2752×1536 images; Deep Research ≈ 9.5 min |
-| Mouse/keyboard control, Obsidian / Git MCP, custom MCP | **macOS build only** (native Swift, not Electron; absent on Windows, and CDP does not apply to the Mac build) | Confirmed by binary strings; per-account rollout still pending |
+| Obsidian / Git MCP, custom MCP, schedules, Skills, local folders | **macOS build only**, inside Spark mode (native Swift, not Electron; absent on Windows, and CDP does not apply to the Mac build) | Live on a Taiwan Ultra account as of 2026-09-16; Workspace accounts get no Spark tab |
+| Mouse/keyboard control (Computer Use) | Not available anywhere yet | Full module present in the macOS binary, but no settings entry has been rolled out to the account |
 
 Full write-up (CDP remote control on Windows, macOS reverse-engineering, speed/token comparison):
 [Gemini Desktop teardown, 3rd edition](https://notes.mynet.com.tw/tech/gemini-desktop-vs-agy-cli) (zh-TW).
