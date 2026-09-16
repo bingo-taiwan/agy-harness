@@ -1,0 +1,42 @@
+# Gemini Desktop 協作規則（貼進 ~/.gemini/GEMINI.md 或專案 AGENTS.md；Claude Code 貼進 CLAUDE.md）
+
+這台電腦裝了 Gemini Desktop，登入的是使用者自己的 Gemini 訂閱（Pro 或 Ultra）。
+它的產圖、Deep Research、Canvas 用的是訂閱額度，不燒 API key。下面這張表決定什麼任務走哪條路。
+
+| 任務 | 用什麼 | 為什麼 |
+|------|--------|--------|
+| 查 Gmail / 日曆 / Drive / Sheets 的資料，或寫入 | `gws` CLI | 秒級回精確 JSON；Gemini `@Gmail` 要 20 幾秒且只給摘要 |
+| 無頭產圖、批次、在腳本裡問模型、看圖看 PDF | `agy`（`generate_image`、`--model`、`@路徑`） | 免 UI；解析度約 1376×768 |
+| 原尺寸 Nano Banana 圖（2752×1536）、Deep Research 長報告、Canvas 單頁程式、Gems、對話紀錄、Gemini Notebook | **Gemini Desktop**（Windows：用下面的 `gemini.py` 遙控；macOS：由人在視窗操作） | 只有 Gemini app 有這些，且用訂閱額度 |
+| 影片、音樂生成 | Gemini Desktop 工具選單有入口 | 未實測，用到先驗證 |
+| 操控滑鼠鍵盤、看桌面 | 都不行 | Windows 版沒有；macOS 版程式裡有模組但尚未開放 |
+| 網頁搜尋、抓網頁 | 你原本的網頁工具 | Gemini `@` 沒有網頁連接器 |
+
+## Windows：遙控 Gemini Desktop（CDP）
+
+```bash
+export PYTHONIOENCODING=utf-8
+G="uv run -q --with websocket-client python <repo>/gemini-desktop/windows/gemini.py"
+$G launch            # 埠開著就直接用；沒開就帶埠啟動（使用者正在用時會被打斷，先講）
+$G doctor            # 元件定位是否仍有效；Gemini 改版壞掉先跑這個
+$G image "描述" --out-dir ./out             # 產圖，原尺寸落地
+$G ask "問題" --file ./doc.pdf --out ./a.md   # 看檔問答；--model flash-lite|flash|pro|thinking
+$G canvas "需求" --out ./page.html           # Canvas 寫單頁程式
+$G research "主題"                           # Deep Research：先停在計畫給使用者確認
+$G research-start --conv <id> --out ./r.md   # 確認後開跑，約 10 分鐘
+$G close             # 用完一定關埠
+```
+
+規則：
+- 一次只跑一個指令，不要平行。
+- 遙控埠開著期間本機任何程式都能操作這個 Google 帳號，用完就 `close`；絕不加 `--remote-allow-origins=*`。
+- 每次 `ask/image/canvas/research` 都會在使用者的 Gemini 對話紀錄留一則，做完提醒使用者。
+- 元件定位照 **zh-TW 介面文字**寫，Gemini 介面語言要設繁體中文；其他語言要改 `gemini.py` 檔頭的 `SEL`。
+- 回答超過幾百字就加 `--out`，只拿檔案路徑回來，省 context。
+- Deep Research 花額度又慢，除非使用者明說直接跑，先把計畫給他看。
+
+## macOS：沒有遙控入口
+
+macOS 版是原生 Swift app，沒有 CDP、AppleScript 字典或 App Intents。agent 不要嘗試操作它的視窗。
+Ultra 帳號有 Spark 分頁（排程、技能、Obsidian/Git 本機 MCP、自訂 MCP、資料夾存取），那是使用者自己用的；
+agent 這邊照上表走 gws / agy。
