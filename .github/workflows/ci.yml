@@ -26,11 +26,11 @@ jobs:
           if ($c -notlike "*<!-- agy-harness:begin v$v -->*Files-On-Demand*view_file*<!-- agy-harness:end -->*") { throw "v$v block missing after install" }
           if (-not (Test-Path (Join-Path $env:USERPROFILE ".gemini\bin\agy-safe.ps1"))) { throw "agy-safe.ps1 not installed" }
 
-          $out = .\setup-agy-harness.ps1 | Out-String
+          $out = .\setup-agy-harness.ps1 *>&1 | Out-String
           if ($out -notlike "*[~]*v$v*") { throw "second run did not skip: $out" }
 
           Set-Content VERSION -Value "99.0.0" -NoNewline
-          $out = .\setup-agy-harness.ps1 | Out-String
+          $out = .\setup-agy-harness.ps1 *>&1 | Out-String
           if ($out -notlike "*v$v -> v99.0.0*") { throw "upgrade path did not replace block: $out" }
           $c = Get-Content $agents -Raw
           if (([regex]::Matches($c, "agy-harness:begin")).Count -ne 1) { throw "duplicate blocks after upgrade" }
