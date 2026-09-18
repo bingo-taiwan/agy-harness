@@ -67,6 +67,13 @@ cd agy-harness
 bash setup-agy-harness.sh
 ```
 
+**macOS 加註（2026-09-18 mac mini 實測）**：agy 在 Mac 的 GUI Terminal 登入後，token 存在 Keychain，
+從 SSH 進來跑 `agy` 會一直回「請先登入」（log 寫 `falling back to file: exit status 36`，先 `security unlock-keychain` 也沒用，
+因為 agy 是叫系統 `security` 指令讀 Keychain，SSH session 沒畫面跳「允許存取」）。
+解法：在 Mac 上開 Terminal 執行 `ssh <user>@localhost` 再跑一次 `agy`，agy 會把 token 落地成
+`~/.gemini/antigravity-cli/antigravity-oauth-token`（600），之後任何機器 SSH 進來 `agy -p` 都通。
+要讓遠端 agent 用這台 Mac 的 agy（例如從 Linux 伺服器排程呼叫），這步一定要做。
+
 ---
 
 ### 💡 使用方式 (Usage)
@@ -123,11 +130,13 @@ C:\Users\user\.gemini\bin\agy-safe.ps1 -p "讀取 @'X:\專案\數據.xlsx' 與 O
 | :--- | :--- | :--- |
 | Query Gmail / Calendar / Drive data | `gws` CLI | 3 s, exact JSON; Gemini `@Gmail` takes 24 s and returns a summary |
 | Headless image generation, model calls inside a pipeline | `agy` (`generate_image`, `--model`) | 31 s, 1376×768 |
-| Full-size Nano Banana images, Deep Research, Canvas, Gems | Gemini Desktop (Windows build can be driven over CDP) | 2752×1536 images; Deep Research ≈ 9.5 min |
+| Full-size Nano Banana images, Deep Research, Canvas, Gems | Gemini Desktop (same `gemini.py` drives the app on Windows and Chrome + gemini.google.com on macOS) | 2752×1536 images; Deep Research ≈ 9.5 min |
 | Obsidian / Git MCP, custom MCP, schedules, Skills, local folders | **macOS build only**, inside Spark mode (native Swift, not Electron; absent on Windows, and CDP does not apply to the Mac build) | Live on a Taiwan Ultra account as of 2026-09-16; Workspace accounts get no Spark tab |
 | Mouse/keyboard control (Computer Use) | Not available anywhere yet | Full module present in the macOS binary, but no settings entry has been rolled out to the account |
 
 **Native agy vs. agy-harness + a Pro/Ultra Gemini subscription (Windows/macOS Gemini Desktop):** what each one adds and when plain agy is enough — see the comparison section in [`gemini-desktop/README.md`](gemini-desktop/README.md) (zh-TW).
+
+**macOS + SSH note (measured 2026-09-18):** a token saved from a GUI login lives in Keychain and is unreadable from an SSH session (`falling back to file: exit status 36`; unlocking the keychain does not help). Run `ssh <user>@localhost` on the Mac and start `agy` once inside that session; the token is then written to `~/.gemini/antigravity-cli/antigravity-oauth-token` and remote `agy -p` calls work.
 
 **One-shot setup on a client's machine:** see [`gemini-desktop/`](gemini-desktop/README.md) — `install.ps1` (Windows), `install.sh` (macOS), the CDP driver `cdp/gemini.py` (drives the app on Windows, Chrome + gemini.google.com on macOS), and `GEMINI.md.snippet` to paste into the agent's instructions.
 
