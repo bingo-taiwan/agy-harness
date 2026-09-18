@@ -120,6 +120,24 @@ Gemini 改版壞掉時怎麼找新元件：[`gemini-desktop/cdp/selectors-and-tr
 
 ---
 
+### 更新
+
+**更新就是再跑一次安裝指令**（上面步驟 1 那一行）。安裝腳本注入的規則是一個有版本標記的區塊：
+
+```
+<!-- agy-harness:begin v1.1.0 -->
+…規則…
+<!-- agy-harness:end -->
+```
+
+- 檔案裡的版本比 repo 舊 → 整段換新；相同 → 略過；區塊**外面**你自己寫的東西永遠不動。
+- 目前版本在 [`VERSION`](VERSION)，每次發版打 git tag（`v1.1.0` 起）。
+- Windows 的 `agy-safe.ps1` 每天最多查一次 GitHub 上的 `VERSION`，有新版只印一行提醒，**不會自動改任何檔案**（改 agent 規則不該背著人做）；離線或查不到就靜默。
+- `gemini-desktop/cdp/gemini.py` 是從 clone 目錄直接執行的，更新就是 `git pull`。
+- 1.1.0 之前裝的舊版規則沒有標記，重跑安裝會加上新區塊並提醒你舊那段還在（內容重複無害，想清乾淨手動刪掉 `## agy CLI 全格式…` 那段）。
+
+---
+
 ### 檔案安全 harness：`agy` 不再被二進位檔炸掉
 
 步驟 1 的安裝腳本會把下面這些鐵律寫進 `~/.gemini/GEMINI.md`、`~/AGENTS.md`、`~/CLAUDE.md`：
@@ -261,6 +279,24 @@ How to locate new elements when Gemini updates break selectors: [`gemini-desktop
 **5. Paste routing rules to your agent**
 
 Paste `gemini-desktop/GEMINI.md.snippet` into `~/.gemini/GEMINI.md`, your project's `AGENTS.md`, or Claude Code's `CLAUDE.md`.
+
+---
+
+### Updating
+
+**Updating means re-running the install command** (the one-liner in step 1). The rules the installer injects live inside a versioned block:
+
+```
+<!-- agy-harness:begin v1.1.0 -->
+…rules…
+<!-- agy-harness:end -->
+```
+
+- Block older than the repo → replaced as a whole; same version → skipped; anything you wrote **outside** the block is never touched.
+- The current version is in [`VERSION`](VERSION); every release gets a git tag (from `v1.1.0` on).
+- On Windows, `agy-safe.ps1` checks the `VERSION` on GitHub at most once a day and prints a single reminder line when a newer one exists. It **never modifies any file on its own** (agent rules should not change behind your back); offline or unreachable is silent.
+- `gemini-desktop/cdp/gemini.py` runs straight from the clone, so updating it is `git pull`.
+- Installs older than 1.1.0 have no markers. Re-running the installer appends the new block and tells you the old one is still there (duplicate content is harmless; delete the old `## agy CLI 全格式…` section by hand to clean up).
 
 ---
 

@@ -7,34 +7,50 @@ on:
     branches: [ main, master ]
 
 jobs:
-  validate:
-    name: Validate Scripts & Harness Rules
+  windows:
+    name: Windows installer (install / skip / upgrade)
     runs-on: windows-latest
-
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Run Python Generator & Verify UTF-8 BOM
-        run: |
-          python build_installer.py
-
-      - name: Test PowerShell Setup Installer
+      - name: Install, re-run (must skip), bump VERSION, re-run (must upgrade)
         shell: powershell
         run: |
+          $ErrorActionPreference = "Stop"
+          $v = (Get-Content VERSION -Raw).Trim()
           .\setup-agy-harness.ps1
+          $agents = Join-Path $env:USERPROFILE "AGENTS.md"
+          $c = Get-Content $agents -Raw
+          if ($c -notlike "*<!-- agy-harness:begin v$v -->*OneDrive 與雲端隨選檔案*<!-- agy-harness:end -->*") { throw "v$v block missing after install" }
+          if (-not (Test-Path (Join-Path $env:USERPROFILE ".gemini\bin\agy-safe.ps1"))) { throw "agy-safe.ps1 not installed" }
 
-      - name: Verify Rule Injections
-        shell: powershell
+          $out = .\setup-agy-harness.ps1 | Out-String
+          if ($out -notlike "*略過*") { throw "second run did not skip" }
+
+          Set-Content VERSION -Value "99.0.0" -NoNewline
+          $out = .\setup-agy-harness.ps1 | Out-String
+          if ($out -notlike "*v$v -> v99.0.0*") { throw "upgrade path did not replace block: $out" }
+          $c = Get-Content $agents -Raw
+          if (([regex]::Matches($c, "agy-harness:begin")).Count -ne 1) { throw "duplicate blocks after upgrade" }
+          if ($c -notlike "*begin v99.0.0*") { throw "block version not bumped" }
+          Write-Host "Windows installer: install / skip / upgrade all OK"
+
+  unix:
+    name: Bash installer (install / skip / upgrade)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install, re-run (must skip), bump VERSION, re-run (must upgrade)
         run: |
-          $userHome = $env:USERPROFILE
-          $agentsFile = Join-Path $userHome "AGENTS.md"
-          if (Test-Path $agentsFile) {
-              $content = Get-Content $agentsFile -Raw
-              if ($content -like "*OneDrive 與雲端隨選檔案*") {
-                  Write-Host "AGENTS.md validation passed!"
-              } else {
-                  Write-Error "AGENTS.md rule injection failed!"
-                  exit 1
-              }
-          }
+          set -e
+          v=$(tr -d '[:space:]' < VERSION)
+          bash setup-agy-harness.sh
+          grep -q "<!-- agy-harness:begin v$v -->" ~/AGENTS.md
+          grep -q "OneDrive 與雲端隨選檔案" ~/.gemini/GEMINI.md
+          bash setup-agy-harness.sh | grep -q "略過"
+          printf '99.0.0' > VERSION
+          bash setup-agy-harness.sh | grep -q "v$v -> v99.0.0"
+          [ "$(grep -c 'agy-harness:begin' ~/AGENTS.md)" = "1" ]
+          grep -q "begin v99.0.0" ~/AGENTS.md
+          echo "Bash installer: install / skip / upgrade all OK"

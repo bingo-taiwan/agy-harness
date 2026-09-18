@@ -1,4 +1,4 @@
-<#
+﻿<#
 .SYNOPSIS
     Smart Multi-Format & OneDrive Safe Launcher for Antigravity CLI (agy)
 .DESCRIPTION
@@ -24,6 +24,22 @@ if (-not $agyExe -or -not (Test-Path -LiteralPath $agyExe)) {
     Write-Error "找不到 agy.exe 可執行檔，請確認 agy 已正確安裝。"
     exit 1
 }
+
+# ---- 每天最多查一次 GitHub 上的 VERSION，有新版只印一行提醒，絕不自動改任何檔案；網路失敗靜默 ----
+try {
+    $binDir = Split-Path -Parent $MyInvocation.MyCommand.Path
+    $localVerFile = Join-Path $binDir "agy-harness.version"
+    $stampFile = Join-Path $binDir ".agy-harness-last-check"
+    $due = -not (Test-Path -LiteralPath $stampFile) -or ((Get-Date) - (Get-Item -LiteralPath $stampFile).LastWriteTime).TotalHours -ge 24
+    if ($due -and (Test-Path -LiteralPath $localVerFile)) {
+        Set-Content -LiteralPath $stampFile -Value (Get-Date -Format s) -NoNewline
+        $local = [version](Get-Content -LiteralPath $localVerFile -Raw).Trim()
+        $remote = [version](Invoke-WebRequest -UseBasicParsing -TimeoutSec 3 -Uri "https://raw.githubusercontent.com/bingo-taiwan/agy-harness/main/VERSION").Content.Trim()
+        if ($remote -gt $local) {
+            Write-Host "[agy-safe] agy-harness 有新版 v$remote（目前 v$local）。更新：重跑一次安裝指令即可，見 https://github.com/bingo-taiwan/agy-harness#更新" -ForegroundColor Magenta
+        }
+    }
+} catch { }
 
 # 涵蓋二進位檔副檔名正則
 $supportedExt = "(jpg|jpeg|png|webp|gif|bmp|pdf|docx?|xlsx?|pptx?|zip|rar|7z|csv)"
