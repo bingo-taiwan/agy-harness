@@ -96,7 +96,7 @@ C:\Users\user\.gemini\bin\agy-safe.ps1 -p "讀取 @'X:\專案\數據.xlsx' 與 O
 | 操控滑鼠鍵盤（Computer Use） | 目前沒有任何一條路 | macOS 版二進位檔有完整模組，但設定頁尚未對帳號開放 |
 
 - 只裝原生 agy 跟多裝這一包（含 Pro/Ultra 訂閱、Windows/macOS Gemini Desktop）差在哪、各自什麼時候夠用：[gemini-desktop/README.md「跟只裝原生 agy 差在哪」](gemini-desktop/README.md#跟只裝原生-agy-差在哪)。
-- **遠端到客戶電腦要一次裝好、讓他的 agent 會用：** `gemini-desktop/`（[說明](gemini-desktop/README.md)）——Windows `install.ps1`、macOS `install.sh`、遙控腳本 `windows/gemini.py`（Windows 遙控 app、macOS 遙控 Chrome 網頁版）、貼給 agent 的 `GEMINI.md.snippet`。
+- **遠端到客戶電腦要一次裝好、讓他的 agent 會用：** `gemini-desktop/`（[說明](gemini-desktop/README.md)）——Windows `install.ps1`、macOS `install.sh`、遙控腳本 `cdp/gemini.py`（Windows 遙控 app、macOS 遙控 Chrome 網頁版）、貼給 agent 的 `GEMINI.md.snippet`。
 - Windows 版怎麼用 CDP 遙控、macOS 版逆向細節、三條路的速度與 token 對照：
   [Gemini Desktop 實機拆解第三版](https://notes.mynet.com.tw/tech/gemini-desktop-vs-agy-cli)
 - 讓 agent 自動選對工具：把上面這張表放進你的 `AGENTS.md` / `GEMINI.md`，範本見 [agent-md-starter](https://github.com/bingo-taiwan/agent-md-starter)。
@@ -129,7 +129,7 @@ C:\Users\user\.gemini\bin\agy-safe.ps1 -p "讀取 @'X:\專案\數據.xlsx' 與 O
 
 **Native agy vs. agy-harness + a Pro/Ultra Gemini subscription (Windows/macOS Gemini Desktop):** what each one adds and when plain agy is enough — see the comparison section in [`gemini-desktop/README.md`](gemini-desktop/README.md) (zh-TW).
 
-**One-shot setup on a client's machine:** see [`gemini-desktop/`](gemini-desktop/README.md) — `install.ps1` (Windows), `install.sh` (macOS), the CDP driver `windows/gemini.py` (drives the app on Windows, Chrome + gemini.google.com on macOS), and `GEMINI.md.snippet` to paste into the agent's instructions.
+**One-shot setup on a client's machine:** see [`gemini-desktop/`](gemini-desktop/README.md) — `install.ps1` (Windows), `install.sh` (macOS), the CDP driver `cdp/gemini.py` (drives the app on Windows, Chrome + gemini.google.com on macOS), and `GEMINI.md.snippet` to paste into the agent's instructions.
 
 Full write-up (CDP remote control on Windows, macOS reverse-engineering, speed/token comparison):
 [Gemini Desktop teardown, 3rd edition](https://notes.mynet.com.tw/tech/gemini-desktop-vs-agy-cli) (zh-TW).

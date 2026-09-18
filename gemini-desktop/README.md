@@ -24,8 +24,8 @@ bash agy-harness/gemini-desktop/install.sh
 | 檔案 | 用途 |
 |------|------|
 | `install.ps1` / `install.sh` | 下載官方安裝檔、安裝、提醒登入；Windows 版順便跑一次遙控體檢 |
-| `windows/gemini.py` | 用 CDP 遙控 Gemini（Windows 遙控 app；macOS 自動改遙控 Chrome 網頁版，指令相同）：`launch / doctor / ask / image / canvas / research / history / open / gems / tools / shot / close` |
-| `windows/selectors-and-traps.md` | Gemini 改版後怎麼找新元件、已知的坑 |
+| `cdp/gemini.py` | 用 CDP 遙控 Gemini（Windows 遙控 app；macOS 自動改遙控 Chrome 網頁版，指令相同）：`launch / doctor / ask / image / canvas / research / history / open / gems / tools / shot / close` |
+| `cdp/selectors-and-traps.md` | Gemini 改版後怎麼找新元件、已知的坑 |
 | `GEMINI.md.snippet` | 給 agent 讀的路由規則（任務 → 工具）與 gemini.py 用法 |
 | `mac/README.md` | macOS 版能拿到什麼（Spark、MCP、排程、技能）、app 為什麼遙控不了、agent 改走 Chrome 網頁版的做法 |
 

@@ -19,7 +19,7 @@ Mac 版是原生 Swift app，**app 本身 agent 遙控不了**；但 Gemini 的�
 
 ## agent 怎麼遙控：走 Chrome 網頁版（2026-09-18 michelle mac mini 實測）
 
-Windows 版 Gemini Desktop 是 Electron 殼包 gemini.google.com，所以 `../windows/gemini.py` 在 macOS 上會自動切分支：
+Windows 版 Gemini Desktop 是 Electron 殼包 gemini.google.com，所以 `../cdp/gemini.py` 在 macOS 上會自動切分支：
 `launch` 用 `open -na "Google Chrome"` 帶 `--remote-debugging-port=9222` 和獨立 `--user-data-dir=~/gemini-cdp-profile` 開網頁版，
 其餘 `doctor / ask / image / canvas / research / close` 指令與 Windows 完全相同。
 

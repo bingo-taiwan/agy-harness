@@ -31,7 +31,7 @@ cat <<'EOF'
      新增 Mac 資料夾。Workspace 公司帳號沒有 Spark。Pro 帳號未實測。
   3. 電腦控制（Computer Use）目前沒開放給任何帳號，設定裡看不到；系統會要 Accessibility 權限但沒有對應功能。
 
-==> agent 怎麼用它：Mac 版 app 沒有遙控入口，但同一支 gemini-desktop/windows/gemini.py 在 Mac 上會改遙控
+==> agent 怎麼用它：Mac 版 app 沒有遙控入口，但同一支 gemini-desktop/cdp/gemini.py 在 Mac 上會改遙控
     Chrome 開的網頁版（獨立 profile，第一次要人登入一次），產圖 / Deep Research / Canvas 指令與 Windows 相同。
     查資料用 gws CLI，無頭產圖或問模型用 agy；只有 Spark（排程、本機 MCP）要由人在 Gemini 視窗操作。
     細節見 gemini-desktop/mac/README.md。

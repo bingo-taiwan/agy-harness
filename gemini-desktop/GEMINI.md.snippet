@@ -16,7 +16,7 @@
 
 ```bash
 export PYTHONIOENCODING=utf-8
-G="uv run -q --with websocket-client python <repo>/gemini-desktop/windows/gemini.py"
+G="uv run -q --with websocket-client python <repo>/gemini-desktop/cdp/gemini.py"
 $G launch            # 埠開著就直接用；沒開就帶埠啟動（使用者正在用時會被打斷，先講）
 $G doctor            # 元件定位是否仍有效；Gemini 改版壞掉先跑這個
 $G image "描述" --out-dir ./out             # 產圖，原尺寸落地
