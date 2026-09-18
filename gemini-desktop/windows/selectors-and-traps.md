@@ -31,6 +31,8 @@ Gemini 改版後 selector 失效時，照「怎麼摸新 selector」重找，再
 6. **原生檔案選擇視窗攔不到**：點工具選單「上傳檔案」後等不到 `Page.fileChooserOpened`，Electron 的原生對話框繞過了這個事件。上傳一律用拖放。
 7. **Windows 主控台編碼**：Python 印中文到 cp950 主控台會 `UnicodeEncodeError`，要 `PYTHONIOENCODING=utf-8`。
 8. **JS 字串裡的換行**：在 Python f-string 裡寫 `'\n'` 會變成真的換行字元送進 JS，造成 `SyntaxError: Invalid or unexpected token`。用 `String.fromCharCode(10)`。
+10. **網頁版有 Trusted Types**：Chrome 直接開 gemini.google.com 時，對元素設 `innerHTML` 會丟 `This document requires 'TrustedHTML' assignment`（Electron 版沒這道）。清空輸入框改用 `e.replaceChildren()`，兩邊都合法。腳本內其餘操作本來就走 `Input.insertText` / DOM API，不受影響。
+11. **macOS 上 Chrome 關視窗不等於結束**：使用者關掉遙控用的 Chrome 視窗後，行程還在、遙控埠還開，但 `/json/list` 沒有 page 目標。用 `PUT /json/new?<url>` 補分頁即可，不必重啟。
 9. **app 內沒有額度顯示**：左下只顯示方案名稱「Ultra」；帳戶連結會開外部瀏覽器，CDP 攔不到。
 
 ## 怎麼摸新 selector

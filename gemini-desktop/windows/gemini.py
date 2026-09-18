@@ -8,6 +8,9 @@ selector 全部集中在 SEL，Gemini 改版壞掉先跑 `doctor` 看哪個失�
 import argparse, base64, glob, json, os, pathlib, re, subprocess, sys, time, urllib.request
 
 PORT = 9222
+IS_MAC = sys.platform == "darwin"  # macOS 沒有 Electron 版 Gemini Desktop，改用 Chrome 獨立 profile 開 gemini.google.com
+MAC_CHROME = "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+MAC_PROFILE = os.path.expanduser("~/gemini-cdp-profile")  # 獨立 profile：不動使用者自己的 Chrome，新版 Chrome 對預設 profile 開遙控埠也有限制
 BASE = "https://gemini.google.com"
 SEL = {  # 2026-09-13 實測，Gemini Desktop app-1.10.4，UI zh-TW
     "editor": "div.ql-editor[contenteditable=true]",
@@ -46,11 +49,15 @@ def port_open():
 
 
 def gemini_running():
+    if IS_MAC:
+        return bool(subprocess.run(["pgrep", "-f", MAC_PROFILE], capture_output=True, text=True).stdout.strip())
     r = subprocess.run(["tasklist", "/FI", "IMAGENAME eq Gemini.exe", "/NH"], capture_output=True, text=True)
     return "Gemini.exe" in r.stdout
 
 
 def find_exe():
+    if IS_MAC:
+        return MAC_CHROME
     exes = glob.glob(os.path.expandvars(r"%LOCALAPPDATA%\Google\Gemini\app-*\Gemini.exe"))
     if not exes:
         raise RuntimeError("找不到 Gemini.exe（%LOCALAPPDATA%\\Google\\Gemini\\app-*）")
@@ -175,7 +182,7 @@ class Gemini:
 
     def send(self, prompt):
         n0 = self.js(f"document.querySelectorAll({json.dumps(SEL['response'])}).length") or 0
-        self.js(f"(()=>{{const e=document.querySelector({json.dumps(SEL['editor'])});e.focus();e.innerHTML='';}})()")
+        self.js(f"(()=>{{const e=document.querySelector({json.dumps(SEL['editor'])});e.focus();e.replaceChildren();}})()")
         self.cdp("Input.insertText", text=prompt); time.sleep(0.6)
         for typ in ("keyDown", "keyUp"):
             self.cdp("Input.dispatchKeyEvent", type=typ, key="Enter", code="Enter", windowsVirtualKeyCode=13, nativeVirtualKeyCode=13)
@@ -258,11 +265,15 @@ def cmd_launch(a):
         out({"ok": True, "status": "already_open"})
     if gemini_running() and not a.restart:
         out({"ok": False, "error": "Gemini 正在執行但沒開遙控埠。加 --restart 會強制關閉重開（使用者正在進行的對話畫面會被打斷）"}, 1)
-    subprocess.run(["taskkill", "/F", "/IM", "Gemini.exe"], capture_output=True)
+    kill_gemini()
     time.sleep(2)
     exe = find_exe()
-    # 單例鎖：舊行程沒死光時參數會被丟掉，所以上面先 taskkill
-    subprocess.Popen([exe, f"--remote-debugging-port={PORT}"], creationflags=0x00000008 | 0x00000200, close_fds=True)
+    # 單例鎖：舊行程沒死光時參數會被丟掉，所以上面先 kill
+    if IS_MAC:  # open -n 開新實例、掛在使用者 GUI session；獨立 profile 不影響使用者自己的 Chrome
+        subprocess.run(["open", "-na", "Google Chrome", "--args", f"--remote-debugging-port={PORT}", f"--user-data-dir={MAC_PROFILE}",
+                        "--no-first-run", "--no-default-browser-check", f"{BASE}/app"], check=True)
+    else:
+        subprocess.Popen([exe, f"--remote-debugging-port={PORT}"], creationflags=0x00000008 | 0x00000200, close_fds=True)
     t0 = time.time()
     while not port_open():
         if time.time() - t0 > 40: out({"ok": False, "error": "遙控埠 40 秒內沒起來"}, 1)
@@ -272,10 +283,17 @@ def cmd_launch(a):
     out({"ok": True, "status": "launched", "exe": exe, "seconds": round(time.time() - t0)})
 
 
+def kill_gemini():
+    if IS_MAC:
+        subprocess.run(["pkill", "-f", MAC_PROFILE], capture_output=True)  # 只殺遙控用的 Chrome 實例
+    else:
+        subprocess.run(["taskkill", "/F", "/IM", "Gemini.exe"], capture_output=True)
+
+
 def cmd_close(a):
-    subprocess.run(["taskkill", "/F", "/IM", "Gemini.exe"], capture_output=True)
+    kill_gemini()
     time.sleep(2)
-    if a.reopen:  # 以一般模式重開（沒有遙控埠）
+    if a.reopen and not IS_MAC:  # mac 沒有「一般模式」可重開，使用者自己的 Chrome 本來就沒被動到  # 以一般模式重開（沒有遙控埠）
         subprocess.Popen([find_exe()], creationflags=0x00000008 | 0x00000200, close_fds=True)
         time.sleep(3)
     out({"ok": not port_open(), "port_closed": not port_open(), "reopened": a.reopen})
@@ -470,7 +488,7 @@ def cmd_shot(a):
 def main():
     sys.stdout.reconfigure(encoding="utf-8")
     p = argparse.ArgumentParser(description="遙控 Gemini Desktop（CDP）")
-    p.add_argument("--debug-dir", default=os.path.join(os.environ.get("TEMP", "."), "gemini-cdp-debug"), help="失敗時截圖存放處")
+    p.add_argument("--debug-dir", default=os.path.join(os.environ.get("TEMP") or os.environ.get("TMPDIR") or ".", "gemini-cdp-debug"), help="失敗時截圖存放處")
     sp = p.add_subparsers(dest="cmd", required=True)
 
     def conv_opts(s, tool=True):

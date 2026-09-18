@@ -7,12 +7,12 @@
 |------|--------|--------|
 | 查 Gmail / 日曆 / Drive / Sheets 的資料，或寫入 | `gws` CLI | 秒級回精確 JSON；Gemini `@Gmail` 要 20 幾秒且只給摘要 |
 | 無頭產圖、批次、在腳本裡問模型、看圖看 PDF | `agy`（`generate_image`、`--model`、`@路徑`） | 免 UI；解析度約 1376×768 |
-| 原尺寸 Nano Banana 圖（2752×1536）、Deep Research 長報告、Canvas 單頁程式、Gems、對話紀錄、Gemini Notebook | **Gemini Desktop**（Windows：用下面的 `gemini.py` 遙控；macOS：由人在視窗操作） | 只有 Gemini app 有這些，且用訂閱額度 |
+| 原尺寸 Nano Banana 圖（2752×1536）、Deep Research 長報告、Canvas 單頁程式、Gems、對話紀錄、Gemini Notebook | **Gemini Desktop**（Windows 遙控 app；macOS 遙控 Chrome 開的網頁版；同一支 `gemini.py`） | 只有 Gemini app 有這些，且用訂閱額度 |
 | 影片、音樂生成 | Gemini Desktop 工具選單有入口 | 未實測，用到先驗證 |
 | 操控滑鼠鍵盤、看桌面 | 都不行 | Windows 版沒有；macOS 版程式裡有模組但尚未開放 |
 | 網頁搜尋、抓網頁 | 你原本的網頁工具 | Gemini `@` 沒有網頁連接器 |
 
-## Windows：遙控 Gemini Desktop（CDP）
+## 遙控 Gemini（CDP）：Windows 遙控 app，macOS 遙控 Chrome 網頁版
 
 ```bash
 export PYTHONIOENCODING=utf-8
@@ -35,8 +35,12 @@ $G close             # 用完一定關埠
 - 回答超過幾百字就加 `--out`，只拿檔案路徑回來，省 context。
 - Deep Research 花額度又慢，除非使用者明說直接跑，先把計畫給他看。
 
-## macOS：沒有遙控入口
+## macOS：app 沒有遙控入口，改遙控 Chrome 網頁版
 
-macOS 版是原生 Swift app，沒有 CDP、AppleScript 字典或 App Intents。agent 不要嘗試操作它的視窗。
-Ultra 帳號有 Spark 分頁（排程、技能、Obsidian/Git 本機 MCP、自訂 MCP、資料夾存取），那是使用者自己用的；
-agent 這邊照上表走 gws / agy。
+macOS 版 Gemini Desktop 是原生 Swift app，沒有 CDP、AppleScript 字典或 App Intents，agent 不要嘗試操作它的視窗。
+但 Windows 版 Electron 殼裡本來就是 gemini.google.com，所以上面同一支 `gemini.py` 在 Mac 上會自動改開
+一個獨立 profile 的 Chrome（`~/gemini-cdp-profile`）到同一個網址，指令完全相同：
+- 第一次 `launch` 後要使用者在那個 Chrome 視窗登入 Google 帳號一次，之後 profile 記住。
+- 使用者關掉那個視窗時行程還在但沒分頁，補一個：`curl -X PUT "http://127.0.0.1:9222/json/new?https://gemini.google.com/app"`。
+- 2026-09-18 mac mini 實測：`ask` 12 秒、`image` 29 秒落地 2816×1536。
+Ultra 帳號的 Spark 分頁（排程、技能、Obsidian/Git 本機 MCP、自訂 MCP、資料夾存取）仍然只有使用者自己或手機派工能用。

@@ -24,17 +24,17 @@ bash agy-harness/gemini-desktop/install.sh
 | 檔案 | 用途 |
 |------|------|
 | `install.ps1` / `install.sh` | 下載官方安裝檔、安裝、提醒登入；Windows 版順便跑一次遙控體檢 |
-| `windows/gemini.py` | 用 CDP 遙控 Windows 版 Gemini Desktop：`launch / doctor / ask / image / canvas / research / history / open / gems / tools / shot / close` |
+| `windows/gemini.py` | 用 CDP 遙控 Gemini（Windows 遙控 app；macOS 自動改遙控 Chrome 網頁版，指令相同）：`launch / doctor / ask / image / canvas / research / history / open / gems / tools / shot / close` |
 | `windows/selectors-and-traps.md` | Gemini 改版後怎麼找新元件、已知的坑 |
 | `GEMINI.md.snippet` | 給 agent 讀的路由規則（任務 → 工具）與 gemini.py 用法 |
-| `mac/README.md` | macOS 版能拿到什麼（Spark、MCP、排程、技能）、為什麼 agent 遙控不了 |
+| `mac/README.md` | macOS 版能拿到什麼（Spark、MCP、排程、技能）、app 為什麼遙控不了、agent 改走 Chrome 網頁版的做法 |
 
 ## 兩個平台差在哪（2026-09-16 實測）
 
 | | Windows（Electron） | macOS（原生 Swift） |
 |---|---|---|
-| agent 能遙控 | **能**，`gemini.py` 走 CDP | 不能 |
-| 產圖 | 2752×1536 原尺寸落地 | 由人操作 |
+| agent 能遙控 | **能**，`gemini.py` 走 CDP | app 不能；同一支 `gemini.py` 改遙控 Chrome 網頁版（實測 ask 12 秒、image 29 秒） |
+| 產圖 | 2752×1536 原尺寸落地 | 網頁版遙控 2816×1536 落地 |
 | Deep Research | 能，約 10 分鐘取回報告與來源 | 由人操作 |
 | Spark（排程、技能、Obsidian/Git MCP、自訂 MCP、資料夾） | Spark 分頁有，但只有雲端連接器 | **Ultra 帳號全有** |
 | 電腦控制 | 沒有 | 程式裡有，帳號沒開 |
@@ -53,7 +53,7 @@ bash agy-harness/gemini-desktop/install.sh
 |------|---------|------|
 | 模型 | `agy models` 清單：Gemini 3.8/3.7/3.6 Flash、3.1 Pro、Claude Sonnet/Opus 4.6、GPT-OSS 120B，可 `--model` 逐次切換 | 同上，再加 Gemini app 內的 Flash-Lite / Flash / Pro / 延伸思考（用訂閱額度） |
 | 額度來源 | Antigravity 帳號 | 兩池並用：agy 跑程式碼，Gemini Desktop 跑產圖、研究，互不搶額度；macOS 版設定頁可看剩餘量 |
-| 產圖 | `generate_image`，實測 1376×768、31 秒 | Windows 遙控 `gemini.py image`：Nano Banana 原尺寸 2752×1536，15–30 秒落地。免費 API key 的圖片配額是 0，訂閱是唯一不花錢的高解析路 |
+| 產圖 | `generate_image`，實測 1376×768、31 秒 | 遙控 `gemini.py image`：Nano Banana 原尺寸 2752×1536（macOS 網頁版 2816×1536），15–30 秒落地。免費 API key 的圖片配額是 0，訂閱是唯一不花錢的高解析路 |
 | 長篇研究報告 | 沒有 | Deep Research：實測約 9.5 分鐘，11,330 字＋111 個來源，落地成 markdown |
 | 單頁程式 | agent 自己寫 | 另有 Canvas：`gemini.py canvas` 取回完整 HTML |
 | Google 連接器 | 沒有（要自己接 gws 或 MCP） | `@Gmail`、`@雲端硬碟`、`@日曆`、`@Keep`、`@Tasks`、`@商家檔案` 等 15 項；適合「幫我摘要」而不是查資料（查資料 gws 3 秒，Gemini 24 秒） |
