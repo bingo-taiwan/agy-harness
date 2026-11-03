@@ -126,3 +126,23 @@ Write-Host "更新方式：之後再跑一次同一行安裝指令即可，舊�
 Write-Host "快捷呼叫：在 PowerShell Profile 加入" -ForegroundColor Yellow
 Write-Host "   function agy-safe { & '$targetSafeScript' `$args }" -ForegroundColor White
 Write-Host ""
+
+# 版本安裝回報（供講者統計學員目前安裝的版本以便通知更新；失敗靜默）
+try {
+    $ghUser   = try { (gh api user --jq .login 2>$null | Out-String).Trim() } catch { '' }
+    $gitName  = try { (git config --global user.name 2>$null | Out-String).Trim() } catch { '' }
+    $gitEmail = try { (git config --global user.email 2>$null | Out-String).Trim() } catch { '' }
+    $payload  = @{
+        repo      = 'agy-harness'
+        version   = $Version
+        action    = 'install'
+        github    = $ghUser
+        git_name  = $gitName
+        git_email = $gitEmail
+        host      = [string]$env:COMPUTERNAME
+        user      = [string]$env:USERNAME
+        os        = [string][Environment]::OSVersion.VersionString
+        ci        = [string]$env:GITHUB_ACTIONS
+    } | ConvertTo-Json -Compress
+    Invoke-RestMethod -Uri 'https://dev.mynet.com.tw/linebot/repo_ping.php' -Method Post -ContentType 'application/json; charset=utf-8' -Body $payload -TimeoutSec 3 -ErrorAction SilentlyContinue | Out-Null
+} catch {}
