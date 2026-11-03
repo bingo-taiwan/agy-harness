@@ -43,7 +43,7 @@ Write-Host "    登入完成按 Enter 繼續檢查；要跳過就 Ctrl+C。"
 $null = Read-Host
 
 $env:PYTHONIOENCODING = "utf-8"
-$py = Join-Path $Here "windows\gemini.py"
+$py = Join-Path $Here "cdp\gemini.py"
 Write-Host "[..] 帶遙控埠啟動並體檢（會關掉目前開著的 Gemini 視窗）"
 uv run -q --with websocket-client python $py launch --restart
 uv run -q --with websocket-client python $py doctor
